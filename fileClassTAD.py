@@ -1,5 +1,11 @@
 import operator
-import fileClass as fc
+
+#Formato da data é mm-dd/rr-hh
+
+# mm : Mês
+# dd : dia / rr : referencia ao dia da semana
+# hh : hora
+
 
 class Data_hours:
     def __init__(self, id, event):
@@ -24,6 +30,7 @@ class Data_day:
         self.id_secund = id_sec
         self.name = dict_days[self.id_secund]
         self.hours_reserved = list()
+
     def add_hours_reserved(self, h):
         if (len(self.hours_reserved) <= 24):
             self.hours_reserved.append(h)
@@ -47,6 +54,9 @@ class Data_day:
         for hours in self.hours_reserved:
             print(hours, end=" ")
         print()
+
+    def is_exist_hours(self, str_hours):
+        return str_hours in [hours.id for hours in self.hours_reserved]
 
 class Date_month:
     def __init__(self, id):
@@ -84,8 +94,8 @@ class Date_month:
         elif self.id in ['4','6', '9', '11']: return 30
         else: return 28
 
-    def get_days_by_week(self, id_semana):
-        return list(filter(lambda day: day.id_princ > str((id_semana-1)*7) and day.id_princ < str(id_semana*7), self.days))
+    def get_days_by_week(self, id_week):
+        return list(filter(lambda day: day.id_princ > str((id_week - 1) * 7) and day.id_princ < str(id_week * 7), self.days))
 
     def get_days_by_id(self, id):
         for day in self.days:
@@ -95,7 +105,47 @@ class Date_month:
     def count_days(self):
         return len(self.days)
 
+    def is_exist_day(self, str_day):
+        return str_day in [day.id_princ for day in self.days]
+
 
 class Agenda:
-    def __init__(self):
+    def __init__(self, year):
+        self.year = year
         self.month = list()
+
+    def is_exist_month(self, str_month):
+        return str_month in [month.id for month in self.month]
+
+    def get_month_by_id(self, str_month):
+        for month in self.month:
+            if month.id == str_month : return month
+        return  -1
+
+    def create_day(self, id_princ, id_sec):
+        return Data_day(id_princ, id_sec)
+
+    def create_hours(self, id, event):
+        return Data_hours(id, event)
+
+    def create_month(self, id):
+        return Date_month(id)
+
+    def add_event(self, event):
+        data = str(event.data).split('-') #mm-dd/rr-hh
+        if self.is_exist_month(data[0]):
+            month = self.get_month_by_id(data[0])
+            dd, rr = data[1].split('/')
+            if month.is_exist_day(dd):
+                day = month.get_days_by_id(dd)
+                day.add_hours_reserved(self.create_hours(data[2], event))
+            else:
+                day = self.create_day(dd, rr)
+                day.add_hours_reserved(self.create_hours(data[2], event))
+        else:
+            month = self.create_month(data[0])
+            dd, rr = data[1].split('/')
+            day = self.create_day(dd, rr)
+            month.add_day(day)
+            hours = self.create_hours(data[2], event)
+            day.add_hours_reserved(hours)

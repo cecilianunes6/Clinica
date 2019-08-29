@@ -52,8 +52,9 @@ class Doctor:
         self.specialties.append(str_spacialty)
 
 class Event:
-    def __init__(self, id, doctor, client):
+    def __init__(self, id, doctor, client, data):
         self.id = id
+        self.data = data
         self.doctor = doctor
         self.client = client
         self.title = str()
