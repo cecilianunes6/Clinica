@@ -1,4 +1,4 @@
-import fileClass as fc
+import fileClassTAD as fc
 
 day = fc.Data_day('25','2')
 
@@ -31,7 +31,6 @@ print("\n\n")
 
 month = fc.Date_month('3')
 
-for days in range(1, 30, 7):
-    month.add_day(fc.Data_day(f'{days}','2'))
+month.add_day(fc.Data_day('15','2'))
 
-print(month)
+print(month.get_days_by_week(3))
